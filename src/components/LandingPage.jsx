@@ -125,7 +125,7 @@ const LandingPage = () => {
         </thead>
 
         <tbody>
-          {console.log(students)}
+          {console.log(fetchFamilyMembers(students[0]?.ID))}
           {students.map((student, index) => (
             <tr key={student.ID}>
               <td className="border px-4 py-2 text-center">{student.ID}</td>

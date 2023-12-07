@@ -50,7 +50,7 @@ const StudentModal = ({ student, role, onClose }) => {
     fetchNationalities()
       .then((data) => {
         setNationalities(data);
-        console.log(nationality)
+        // console.log(nationality)
         if (!nationality?.ID) {
           setNationality(data[0]);
         //   console.log("setting nationality")
@@ -66,6 +66,7 @@ const StudentModal = ({ student, role, onClose }) => {
       fetchFamilyMembers(student.ID)
         .then((familyData) => {
           setFamily(familyData);
+          console.log(familyData)
         })
         .catch((error) => {
           console.error("Fetch Family Members Error:", error.message);
@@ -210,9 +211,9 @@ const StudentModal = ({ student, role, onClose }) => {
                   lastName: f.lastName,
                   relationship: f.relationship,
                   dateOfBirth: f.dateOfBirth,
-                  nationality: f.nationality?.ID ?? 0,
+                  nationality: f.nationality,
                 }).then(() => {
-                  return updateFamilyMemberNationality(f.id, f.nationality.ID);
+                  // return updateFamilyMemberNationality(f.id, f.nationality.ID);
                 });
               } else {
                 return createFamilyMember(student.ID, {
@@ -220,7 +221,7 @@ const StudentModal = ({ student, role, onClose }) => {
                   lastName: f.lastName,
                   relationship: f.relationship,
                   dateOfBirth: f.dateOfBirth,
-                  nationality: f.nationality?.ID ?? 0,
+                  nationality: f.nationality,
                 });
               }
             })
@@ -243,9 +244,10 @@ const StudentModal = ({ student, role, onClose }) => {
         nationality: nationality,
       })
         .then((data) => {
+          // Delete all family members of student
           return Promise.all(
             family.map((f) =>
-              createFamilyMember(data.id, {
+              createFamilyMember(data.ID, {
                 firstName: f.firstName,
                 lastName: f.lastName,
                 relationship: f.relationship,
@@ -271,13 +273,13 @@ const StudentModal = ({ student, role, onClose }) => {
     onClose();
   };
 
-  const memoizedNationalities = useMemo(() => {
-    return nationalities.map((n) => (
-      <option key={n.ID} value={n.ID} data-value={n}>
-        {n.Title}
-      </option>
-    ));
-  }, [nationalities]);
+  // const memoizedNationalities = useMemo(() => {
+  //   return nationalities.map((n) => (
+  //     <option key={n.ID} value={n.ID} data-value={n}>
+  //       {n.Title}
+  //     </option>
+  //   ));
+  // }, [nationalities]);
 
   return (
     <Modal
@@ -336,7 +338,11 @@ const StudentModal = ({ student, role, onClose }) => {
               onChange={handleNationalityChange}
               disabled={role === "Admin" && student.approved}
             >
-              {memoizedNationalities}
+              {nationalities.map((n) => (
+                <option selected={n.Title === nationality?.Title} key={n.ID} value={n.ID} data-value={n}>
+                  {n.Title}
+                </option>
+              ))}
             </select>
           ) : (
             <p>Loading nationalities...</p>
@@ -393,9 +399,10 @@ const StudentModal = ({ student, role, onClose }) => {
                   onChange={(e) => handleFamilyRelationshipChange(i, e)}
                   disabled={role === "Admin" && student.approved}
                 >
-                  <option value="Parent">Parent</option>
-                  <option value="Sibling">Sibling</option>
-                  <option value="Spouse">Spouse</option>
+                  
+                  <option selected={f.relationship === "Parent"} value="Parent">Parent</option>
+                  <option selected={f.relationship === "Sibling"} value="Sibling">Sibling</option>
+                  <option selected={f.relationship === "Spouse"} value="Spouse">Spouse</option>
                 </select>
               </div>
               <div className="flex flex-col gap-2">
@@ -407,7 +414,11 @@ const StudentModal = ({ student, role, onClose }) => {
                   onChange={(e) => handleFamilyNationalityChange(i, e)}
                   disabled={role === "Admin" && student.approved}
                 >
-                  {memoizedNationalities}
+                  {nationalities.map((n) => (
+                    <option selected={n.Title === f.nationality?.Title} key={n.ID} value={n.ID} data-value={n}>
+                      {n.Title}
+                    </option>
+                  ))}
                 </select>
               </div>
             </div>
