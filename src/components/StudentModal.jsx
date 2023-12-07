@@ -31,7 +31,7 @@ const customStyles = {
 };
 
 const StudentModal = ({ student, role, onClose }) => {
-  console.log('student:',student);
+  // console.log('student:',student);
   const initialDateOfBirth = student.dateOfBirth
     ? new Date(student.dateOfBirth)
     : new Date();
@@ -50,6 +50,11 @@ const StudentModal = ({ student, role, onClose }) => {
     fetchNationalities()
       .then((data) => {
         setNationalities(data);
+        console.log(nationality)
+        if (!nationality?.ID) {
+          setNationality(data[0]);
+        //   console.log("setting nationality")
+        }
       })
       .catch((error) => {
         console.error("Fetch Nationalities Error:", error.message);
@@ -164,14 +169,17 @@ const StudentModal = ({ student, role, onClose }) => {
   };
 
   const handleSubmit = () => {
+    // console.log(student)
     if (!firstName || !lastName || !dateOfBirth || !nationality) {
       setError(
         "Please fill in all the fields: First Name, Last Name, Date of Birth, and Nationality."
       );
       return;
     }
+    // console.log(family);
+    // console.log(firstName, lastName, dateOfBirth, nationality)
     if (
-      family.some(
+      family && family.some(
         (f) => !f.firstName || !f.lastName || !f.relationship || !f.nationality
       )
     ) {
@@ -195,7 +203,7 @@ const StudentModal = ({ student, role, onClose }) => {
         })
         .then(() => {
           return Promise.all(
-            family.map((f) => {
+            family && family.map((f) => {
               if (f.id) {
                 return updateFamilyMember(f.id, {
                   firstName: f.firstName,
@@ -232,7 +240,7 @@ const StudentModal = ({ student, role, onClose }) => {
         firstName,
         lastName,
         dateOfBirth: dateOfBirth.toISOString(),
-        nationality: nationality.ID,
+        nationality: nationality,
       })
         .then((data) => {
           return Promise.all(
